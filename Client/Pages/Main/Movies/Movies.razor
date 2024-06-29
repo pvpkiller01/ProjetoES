@@ -1,0 +1,76 @@
+﻿@page "/main/movies/movies"
+
+@using ESProjeto.Client.Services.MovieServices
+@inject IMovieService MovieService
+@using Blazorise
+
+
+<style>
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+
+    .col-3 {
+        width: 25%;
+        padding-left: 15px;
+        padding-right: 15px;
+        box-sizing: border-box;
+    }
+</style>
+
+<h2>Nome da competição</h2>
+<div class="row">
+    @foreach (var movieId in movieIds)
+    {
+        <div class="col-3">
+            <img src="@($"https://image.tmdb.org/t/p/original{@imagePath[movieId]}")" alt="poster" style="max-width:65%; max-height:65%;" />
+            <div>@movieTitles[movieId]<br />
+               <a href="movie/@movieId"><button class="btn btn-primary" onclick="">Details</button></a><br>
+                <button class="btn btn-dark" onclick="">Vote</button>
+            </div>
+            
+        </div>
+
+        @if ((Array.IndexOf(movieIds.ToArray(), movieId) + 1) % 4 == 0)
+        {
+            <div class="w-100"></div> <!-- cria uma quebra de linha -->
+        }
+    }
+</div>
+
+
+
+
+@if (movie == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+}
+
+
+@code {
+    private List<int> movieIds = new List<int>();
+    Dictionary<int, string> movieTitles = new Dictionary<int, string>();
+    Dictionary<int, string> imagePath = new Dictionary<int, string>();
+    private ESProjeto.Client.Services.MovieServices.Movie movie { get; set; }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        for (int id = 11; id <= 15; id++)
+        {
+            movie = await MovieService.GetMovieAsync(id);
+            var movieId = await MovieService.GetMovieIdAsync(id);
+            movieIds.Add(movieId);
+            movieTitles.Add(id,movie.Title);
+            imagePath.Add(id, movie.Poster_Path);
+        }
+    }
+}

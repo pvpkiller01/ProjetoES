@@ -1,0 +1,234 @@
+﻿@media(max-height: 1200px) {
+    .tdMedia{
+       display: none;
+    }
+}
+
+@media(max-width: 1200px) {
+    .tdMedia {
+        display: none;
+    }
+    .footer-container{
+        margin-left: 0;
+    }
+}
+
+.sidebar{
+    z-index: 2;
+}
+.main-content{
+    overflow: auto;
+    z-index: 1;
+}
+
+.competitionWidget{
+    margin-top: 40px;
+}
+
+.competitionWidget, .categoryWidget{
+    border: 2px solid #a8a8a8;
+    border-radius: 8px;
+    padding: 30px;
+    background-color: #e8e2e2;
+}
+
+.categoryWidget {
+    background: white;
+    padding: 0;
+    margin-top: 30px;
+}
+
+.categoryWidgetRow{
+    padding: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.categoryWidgetCol{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 170px;
+    border: 2px solid #a8a8a8;
+    padding: 12px;
+    border-radius: 3px;
+}
+
+.removeButton{
+    width: 144px;
+}
+
+.competitionWidgetOptions{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.categoryWidgetOptions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: #808080;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.footer-container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    background-color: #f2f2f2;
+    padding: 20px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+}
+    .footer-container.open {
+        transform: translateY(0);
+    }
+
+.footer-content{
+    margin-left: 10em;
+}
+
+.footerSpan{
+    align-self: center;
+    justify-self:end;
+}
+
+.adminCompTableRow {
+    background-color: #808080 !important;
+    color: white !important;
+}
+
+.adminCompTableCell {
+    border: none;
+    border-bottom: 1px solid grey !important;
+    align-content: center;
+}
+
+
+html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
+.color-change-2x {
+    -webkit-animation: color-change-2x 4s linear infinite alternate both;
+    animation: color-change-2x 4s linear infinite alternate both;
+    margin: 0;
+    padding: 0;
+    color: white;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+}
+
+.footerLinks{
+    margin-left: 50px;
+    display: flex;
+    flex-direction: row;
+    justify-self: center;
+}
+
+@-webkit-keyframes color-change-2x {
+    0% {
+        background: #19dcea;
+    }
+
+    100% {
+        background: #b22cff;
+    }
+}
+
+@keyframes color-change-2x {
+    0% {
+        background: #19dcea;
+    }
+
+    100% {
+        background: #b22cff;
+    }
+}
+
+#welcome{
+    margin-left: 10%;
+}
+
+#titulo1{
+    font-family:Arial;
+}
+
+#banner {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f1f1f1;
+}
+
+#bannerImage{
+    height: 300px;
+    width: auto;
+}
+
+.nextButton {
+    border-radius: 4px;
+    background-color: #14a9f2;
+    border: none;
+    color: #FFFFFF !important;
+    text-align: center;
+    font-size: 28px;
+    padding: 20px;
+    width: 200px;
+    height: 200px;
+    transition: all 0.5s;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.nextButton a {
+    color: white;
+    text-decoration-line: none;
+}
+
+.nextButton span {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    transition: 0.5s;
+}
+
+    .nextButton span:after {
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        left: -20px;
+        transition: 0.5s;
+    }
+
+.nextButton:hover span {
+    padding-left: 25px;
+}
+
+    .nextButton:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+
+.compTitles{
+    display: flex;
+    justify-self: center;
+}

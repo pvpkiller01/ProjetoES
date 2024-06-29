@@ -1,0 +1,109 @@
+﻿@page "/main/competitions/currentcompetitions"
+@using ESProjeto.Client.Services.CompetitionServices
+@using ESProjeto.Client.Services.MovieServices
+@using ESProjeto.Client.Services.CategoryServices
+@using ESProjeto.Shared.Models
+@inject HttpClient httpClient
+@inject NavigationManager NavigationManager
+@inject ICompetitionService CompetitionService
+@inject ICategoryService CategoryService
+@inject IMovieService MovieService
+@using Blazorise
+
+<h2>Competitions</h2>
+<br />
+<br />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Competition Name</th>
+            <th>Categories</th>
+            <th>State</th>
+            <th>Nominees</th>
+            <th>Go Vote</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @for (int i = 0; i < CompetitionService.Competitions.Count; i++)
+        {
+            <tr>
+                <td>@CompetitionService.Competitions[i].Name</td>
+                <td>
+                    @foreach (var cat in competitionCategories[i])
+                    {
+                        <span>@cat.Name</span>
+                        <br />
+
+                    }
+                </td>
+                <td>@CompetitionService.Competitions[i].State</td>
+                <td>
+                @foreach (var catMovie in categoryMovies[i])
+                {
+                    @foreach (var movie in catMovie)
+                    {
+                        <span>@movie.MovieReference</span>
+                            <br />
+                    }
+                    break; 
+                }
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger" @onclick="() => GoToCategories()">Vote</button>
+                </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    public Movie movie;
+    public List<Movie> movies = new List<Movie>();
+
+    private int currentMovieIndex = 0;
+
+    List<List<Category>> competitionCategories = new List<List<Category>>();
+    List<Category> compCatAux = new List<Category>();
+
+    List<List<List<CategoryMovie>>> categoryMovies = new List<List<List<CategoryMovie>>>();
+    List<List<CategoryMovie>> auxMovies { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CategoryService.GetCategories();
+        await CompetitionService.GetCompetitions();
+
+        foreach (var comp in CompetitionService.Competitions)
+        {
+                auxMovies = new List<List<CategoryMovie>>();
+                compCatAux = new List<Category>();
+                foreach (var cat in CategoryService.Categories)
+                {
+                    if (cat.CompetitionId == comp.Id)
+                    {
+                        compCatAux.Add(cat);
+                        await CategoryService.GetMoviesFromCategories(cat.Id);
+                        auxMovies.Add(CategoryService.MoviesReference);  //Busca os Movies desta cat
+                    }
+                }
+                competitionCategories.Add(compCatAux);
+                categoryMovies.Add(auxMovies);
+        }
+    }
+
+    private void ChangeImage()
+    {
+        if (movies.Count == currentMovieIndex)
+        {
+            currentMovieIndex = 0;
+        }
+        movie = movies[currentMovieIndex];
+        currentMovieIndex++;
+    }
+    private void GoToCategories()
+    {
+        NavigationManager.NavigateTo("/main/competitions/categories");
+    }
+}

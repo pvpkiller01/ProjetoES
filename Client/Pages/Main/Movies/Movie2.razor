@@ -1,0 +1,62 @@
+﻿@page "/main/movies/movie2"
+@using ESProjeto.Client.Services.MovieServices
+@inject IMovieService MovieService
+@using System.Net.Http.Json
+
+<h2>Nome da competição</h2>
+
+<div class="row">
+    @if (movies == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        @foreach (var movie in movies)
+        {
+            <div class="col-3">
+                @if (!string.IsNullOrEmpty(movie.poster_path))
+                {
+                    <img src="@($"https://image.tmdb.org/t/p/original{movie.poster_path}")" alt="poster" style="max-width: 100%; max-height: 100%;" />
+                }
+                else
+                {
+                    <p>No poster available</p>
+                }
+                <p>@movie.title</p>
+                <p>@movie.overview</p>
+                <a href="movie/@movie.id"><button class="btn btn-primary" onclick="">Details</button></a><br>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private List<Movie> movies;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var httpClient = new HttpClient();
+        var response = await httpClient.GetFromJsonAsync<MovieResponse>("https://api.themoviedb.org/3/movie/now_playing?api_key=d1b13f196dd66ad0bd2e69e7eb503b06");
+
+        if (response != null)
+        {
+            movies = response.results;
+        }
+    }
+
+
+    public class MovieResponse
+    {
+        public List<Movie> results { get; set; }
+    }
+
+    public class Movie
+    {
+    public int id { get; set; }
+    public string title { get; set; }
+    public string overview { get; set; }
+    public string poster_path { get; set; }
+    // Adicione outras propriedades conforme necessário para extrair dados da resposta da API
+}
+}

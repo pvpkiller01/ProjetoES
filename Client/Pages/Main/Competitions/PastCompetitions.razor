@@ -1,0 +1,176 @@
+﻿@page "/main/competitions/pastcompetitions"
+@using ESProjeto.Client.Services.CompetitionServices
+@using ESProjeto.Client.Services.MovieServices
+@inject IMovieService MovieService
+@inject ICompetitionService CompetitionService
+@using Blazorise
+<style>
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+
+    .col-3 {
+        width: 25%;
+        padding-left: 15px;
+        padding-right: 15px;
+        box-sizing: border-box;
+        
+    }
+
+    .state-open {
+        font-weight: bold;
+        color: green;
+    }
+
+    .participate-link {
+        color: blue;
+        text-decoration: underline;
+    }
+
+    .closes-in {
+        color: red;
+        font-weight: bold;
+    }
+
+    h2 {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        font-size: 18px;
+        font-weight: bold;
+        color: #555;
+        margin-top: 30px;
+        margin-bottom: 10px;
+    }
+    .divDentro{
+        margin-bottom: 20%;
+    }
+</style>
+
+<h2>Competitions</h2><br /><br />
+
+@foreach (var comp in CompetitionService.Competitions)
+{
+    <h3>@comp.Name</h3>
+
+
+        @foreach (var imageIds in rotatingImageIds)
+        {
+            <div class="col-3">
+                @foreach (var movieId in imageIds)
+                {
+                    <div class="divDentro">
+                        <img src="@GetImageSource(movieId)" alt="poster" style="max-width:65%; max-height:65%;" />
+                        <div class="state-open">State: Open</div>
+                        <div class="closes-in">Closes in: 15:00</div>
+                        <div><a class="participate-link" href="#">Participate</a></div>
+                    </div>
+                }
+            </div>
+        }
+    }
+}
+
+
+
+
+
+
+
+
+@code {
+    private List<List<int>> rotatingImageIds = new List<List<int>>(); // Sequências de IDs dos filmes que serão exibidos em rotação
+    private Dictionary<int, string> imagePath = new Dictionary<int, string>();
+    private List<string> Titles = new List<string> { "Ongoing competitions", "Previous competitions" }; // Adicione os títulos adicionais aqui
+
+    protected override async Task OnInitializedAsync()
+    {
+        rotatingImageIds = GenerateRandomImageSequences(11, 20, 4, 12);
+
+        foreach (var imageIds in rotatingImageIds)
+        {
+            foreach (var movieId in imageIds)
+            {
+                if (!imagePath.ContainsKey(movieId))
+                {
+                    var movie = await MovieService.GetMovieAsync(movieId);
+                    imagePath.Add(movieId, movie.Poster_Path);
+                }
+            }
+        }
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await RotateImages();
+        }
+    }
+
+    private async Task RotateImages()
+    {
+        while (true)
+        {
+            // Espera por 2 segundos
+            await Task.Delay(3500);
+
+            // Rotaciona as imagens
+            RotateImagesByIndex();
+
+            // Atualiza o componente
+            StateHasChanged();
+        }
+    }
+
+    private void RotateImagesByIndex()
+    {
+        var newImageIds = new List<List<int>>();
+        foreach (var imageIds in rotatingImageIds)
+        {
+            var newIds = new List<int>(imageIds.Count);
+            for (int i = 0; i < imageIds.Count; i++)
+            {
+                var index = (i + 1) % imageIds.Count;
+                newIds.Add(imageIds[index]);
+            }
+            newImageIds.Add(newIds);
+        }
+        rotatingImageIds = newImageIds;
+    }
+
+    private List<List<int>> GenerateRandomImageSequences(int minValue, int maxValue, int count, int sequenceCount)
+    {
+        var sequences = new List<List<int>>(sequenceCount);
+        var random = new Random();
+
+        for (int i = 0; i < sequenceCount; i++)
+        {
+            var movieIds = new List<int>(count);
+            while (movieIds.Count < count)
+            {
+                var movieId = random.Next(minValue, maxValue + 1);
+                if (!movieIds.Contains(movieId))
+                {
+                    movieIds.Add(movieId);
+                }
+            }
+            sequences.Add(movieIds);
+        }
+
+        return sequences;
+    }
+
+    private string GetImageSource(int movieId)
+    {
+        return $"https://image.tmdb.org/t/p/original{imagePath[movieId]}";
+    }
+}

@@ -1,0 +1,103 @@
+﻿@page "/"
+@inject HttpClient httpClient
+@using ESProjeto.Shared.Models
+@using ESProjeto.Client.Services.CompetitionServices
+@inject NavigationManager NavigationManager
+@inject ICompetitionService CompetitionService
+
+<link href="/css/movieroll.css" rel="stylesheet" />
+
+
+<div class="color-change-2x">
+	<h1 id="welcome">Welcome!</h1>
+</div>
+<div>
+	<div class="compTitles">
+		<h2>Current competitions</h2>
+	</div>
+	<div class="container borderOla">
+		@foreach (var comp in CompetitionService.Competitions)
+		{
+			@if (@comp.State == "Open")
+			{
+				@if (competitionCount < 4)
+				{
+					competitionCount++;
+					<div class="box">
+						<img src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcR85LxTxW44OOMXaJJHpHQ6QyN64BbcDIiCOOE-LvEECQJ7eBgy" width="144" height="216" />
+						<div class="comp">@comp.Name</div>
+					</div>
+				}
+			}
+			@if (noneActive == 1 && competitionCount == 0 && aux == 4)
+			{
+				<h3>No competitions available.</h3>
+				none = 2;
+			}
+			aux++;
+		}
+		@if (noneActive != 2)
+		{
+			<button class="box nextButton">
+				<a href="/main/competitions/currentcompetitions">
+					See more
+					<span><img src="https://cdn-icons-png.flaticon.com/512/724/724976.png" class="arrow" /></span>
+				</a>
+			</button>
+		}
+	</div>
+	<div class="compTitles">
+		<h2>Check past competitions</h2>
+	</div>
+	<div class="container container-2 border2">
+			@foreach (var comp in CompetitionService.Competitions)
+			{
+				@if (@comp.State == "Closed" || @comp.State == "Suspended")
+				{
+					@if (inactiveCompetitionCount < 4)
+					{
+						inactiveCompetitionCount++;
+						<div class="box">
+							<img src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcR85LxTxW44OOMXaJJHpHQ6QyN64BbcDIiCOOE-LvEECQJ7eBgy" width="144" height="216" />
+							<div class="comp">@comp.Name</div>
+						</div>
+					}
+				}
+				@if(none == 1 && inactiveCompetitionCount == 0 && aux2 == 4)
+				{
+					<h3>No competitions available.</h3>
+					none=2;
+				}
+				aux2++;
+			}
+		@if(none != 2)
+		{
+			<button class="box nextButton">
+				<a href="/main/competitions/pastcompetitions">
+					See more
+					<span><img src="https://cdn-icons-png.flaticon.com/512/724/724976.png" class="arrow" /> </span>
+				</a>
+			</button>
+		}
+	</div>
+</div>
+<div id="banner">
+	<div id="bannerDiv"><img id="bannerImage" src="/images/banner.png"/></div>
+</div>
+
+
+
+@code {
+	int competitionCount = 0;
+	int inactiveCompetitionCount = 0;
+	int noneActive = 1;
+	int none = 1;
+	int aux = 0;
+	int aux2 = 0;
+	protected override async Task OnInitializedAsync()
+	{
+		// Call the GetCompetitions() method
+		await CompetitionService.GetCompetitions();
+
+	}
+}

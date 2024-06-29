@@ -1,0 +1,93 @@
+﻿@page "/admin/category"
+@page "/admin/category/{id:int}"
+@using ESProjeto.Shared.Models
+@using ESProjeto.Client.Services.CategoryServices
+@using ESProjeto.Client.Services.CompetitionServices
+@using ESProjeto.Client.Services.MovieServices
+@inject NavigationManager NavigationManager
+@inject ICategoryService CategoryService
+@inject ICompetitionService CompetitionService
+@inject IMovieService MovieService
+@inject HttpClient httpClient
+@using System.Text.Json;
+
+<h3>Category: @category.Name </h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Movie ID</th>
+            <th>Movie Reference</th>
+            <th>Movie Title </th>
+            <th>Votes</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var aux in CategoryService.MoviesReference)
+        {
+            <tr>
+                @{
+                    int currentCounter = counter++;
+                }
+                <td>@aux.Id</td>
+                <td>@aux.MovieReference</td>
+                <td>@finalMovies[currentCounter].Title</td>
+                <td>@aux.MovieReference</td>
+                <td>@aux.Votes</td>
+                <td>
+                    <button type="button" class="btn btn-danger" @onclick="() => VotesOnCategory(aux.MovieReference)">Vote</button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger" @onclick="() => HandleButtonClick(aux.MovieReference)">View Details</button>
+                </td>
+                
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public int counter { get; set; }
+    Category category { get; set; }
+    Competition competition = new Competition();
+
+    List<CategoryMovie> categoryMovies = new List<CategoryMovie>();
+    List<int> moviesIds = new List<int>();
+    List<Movie> finalMovies = new List<Movie>();
+    private ESProjeto.Client.Services.MovieServices.Movie movie { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        category = await CategoryService.GetSingleCategory(Id);
+        await CompetitionService.GetCompetitions();
+        await CategoryService.GetMoviesFromCategories(Id);
+
+        foreach (var aux in CategoryService.MoviesReference)
+        {
+            var temp = int.Parse(aux.MovieReference.ToString());
+            moviesIds.Add(temp);
+        }
+        foreach (var aux in moviesIds)
+        {
+            var newTemp = int.Parse(aux.ToString());
+            movie = await MovieService.GetMovieAsync(newTemp);
+            finalMovies.Add(movie);
+        }
+    }
+    async Task DeleteCategory(int id)
+    {
+        await CategoryService.DeleteCategory(id);
+        NavigationManager.NavigateTo("/admin/admin");
+    }
+    async Task VotesOnCategory(int MovieReference)
+    {
+        await CategoryService.VoteOnCategory(Id, MovieReference);
+        NavigationManager.NavigateTo("/main/competitions/categories");
+    }
+    public void HandleButtonClick(int MovieReference)
+    {
+        NavigationManager.NavigateTo($"/main/movies/{MovieReference}");
+    }
+}

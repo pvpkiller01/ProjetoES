@@ -1,0 +1,104 @@
+﻿@page "/admin/singlecomp/"
+@page "/admin/singlecomp/{id:int}"
+@inject HttpClient httpClient
+@using ESProjeto.Shared.Models
+@using ESProjeto.Client.Services.CompetitionServices
+@inject NavigationManager NavigationManager
+@inject ICompetitionService CompetitionService
+@using Blazorise
+
+
+
+@foreach (var comp in CompetitionService.Competitions)
+{
+	<Div Class="Row competitionWidget">
+		<Div Class="Col">
+
+			<Div Class="Row">
+				<Div Class="Col">
+					<h3>@comp.Name</h3>
+				</Div>
+				<Div Class="Col">
+					<Span>State: <Badge Color="Color.Success" Pill>Open</Badge></Span>
+				<Span>Closes in: 20:00</Span>
+			</Div>
+		</Div>
+
+		<Div Class="Row competitionWidgetOptions">
+			<Button Class="btn-primary">+ Add category</Button>
+			<Dropdown>
+				<DropdownToggle Color="Color.Secondary" Toggled="true">
+					Select category
+				</DropdownToggle>
+				<DropdownMenu>
+					<DropdownItem>Category 1</DropdownItem>
+					<DropdownItem>Category 2</DropdownItem>
+					<DropdownItem>Category 3</DropdownItem>
+				</DropdownMenu>
+			</Dropdown>
+			<Button Class="btn-warning">Suspend competition for: </Button>
+			<input type="time" id="appt" name="appt"
+				   max="20:00">
+			<Button Class="btn-danger">End competition</Button>
+			<span>Add time:</span>
+			<input type="time" id="appt" name="appt"
+				   max="20:00">
+			<button class="btn btn-primary" @onclick="(() => ShowCompetition(comp.Id))"><i class="oi oi-pencil"></i> Edit</button>
+		</Div>
+
+		<Div Class="Row categoryWidget">
+			<Div Class="Col">
+				<Div Class="Row categoryWidgetOptions">
+					<h4 class="categoryWidgetTitle">[Category]</h4>
+					<Button Class="btn-primary">+ Add nominee</Button>
+					<Button Class="btn-danger">Delete category</Button>
+				</Div>
+				<Div Class="Row categoryWidgetRow">
+					<Div Class="Col categoryWidgetCol">
+						<img src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcR85LxTxW44OOMXaJJHpHQ6QyN64BbcDIiCOOE-LvEECQJ7eBgy" width="144" height="216" />
+						<h4>[MovieName]</h4>
+						<Button Class="btn-danger removeButton">Remove</Button>
+					</Div>
+					<Div Class="Col categoryWidgetCol">
+						<img src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcR85LxTxW44OOMXaJJHpHQ6QyN64BbcDIiCOOE-LvEECQJ7eBgy" width="144" height="216" />
+						<h4>[MovieName]</h4>
+						<Button Class="btn-danger removeButton">Remove</Button>
+					</Div>
+					<Div Class="Col categoryWidgetCol">
+						<img src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcR85LxTxW44OOMXaJJHpHQ6QyN64BbcDIiCOOE-LvEECQJ7eBgy" width="144" height="216" />
+						<h4>[MovieName]</h4>
+						<Button Class="btn-danger removeButton">Remove</Button>
+					</Div>
+					<Div Class="Col categoryWidgetCol">
+						<img src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcR85LxTxW44OOMXaJJHpHQ6QyN64BbcDIiCOOE-LvEECQJ7eBgy" width="144" height="216" />
+						<h4>[MovieName]</h4>
+						<Button Class="btn-danger removeButton">Remove</Button>
+					</Div>
+				</Div>
+			</Div>
+		</Div>
+	</Div>
+</Div>
+	<br />
+}
+<Div Class="Row">
+	<button class="btn btn-primary " @onclick="() => CreateCompetition()"> Create new competition</button>
+</Div>
+
+@code {
+
+	protected override async Task OnInitializedAsync()
+	{
+		await CompetitionService.GetCompetitions();
+	}
+
+	void ShowCompetition(int id)
+	{
+		NavigationManager.NavigateTo($"/admin/competition/{id}");
+
+	}
+	async Task CreateCompetition()
+	{
+		NavigationManager.NavigateTo("/admin/competition");
+	}
+}

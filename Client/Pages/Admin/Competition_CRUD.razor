@@ -1,0 +1,170 @@
+﻿@page "/admin/competition"
+@page "/admin/competition/{id:int}"
+@using Blazorise;
+@using ESProjeto.Client.Services.CompetitionServices
+@using ESProjeto.Client.Services.CategoryServices
+@using ESProjeto.Shared.Models
+@inject HttpClient httpClient
+@inject NavigationManager NavigationManager
+@inject ICompetitionService CompetitionService
+@inject ICategoryService CategoryService
+
+<PageTitle>Competition Editor</PageTitle>
+
+@if(Id == null)
+{
+	<h3>Create a New Competition</h3>
+	<EditForm Model="competition" OnSubmit="HandleSubmit">
+		<Div>
+			<label for="Name">Name</label>
+			<InputText id="name" @bind-Value="competition.Name" class="form-control"></InputText>
+		</Div>
+		<div>
+			<label for="state">State</label>
+			<select id="state" @bind="competition.State" class="form-control">
+				<option value="">-- Select State --</option>
+				<option value="Closed">Closed</option>
+				<option value="Open">Open</option>
+				<option value="Suspended">Suspended</option>
+			</select>
+		</div>
+		<Div>
+			<label for="category">Category</label>
+			<select id="category" class="form-control">
+				@foreach (var category in CategoryService.Categories)
+				{
+					<option value="@category">@category.Name</option>
+				}
+			</select>
+		</Div>
+		<Div class="form-group row">
+			<Label for="startDate" class="col-md-2 col-form-label">Start Date:</Label>
+			<Div class="col-md-10">
+				<InputDate id="startDate" class="form-control" @bind-Value="competition.StartDate" />
+				<ValidationMessage For="@(() => competition.StartDate)" />
+			</Div>
+		</Div>
+		<Div class="form-group row">
+			<Label for="endDate" class="col-md-2 col-form-label">End Date:</Label>
+			<Div class="col-md-10">
+				<InputDate id="endDate" class="form-control" @bind-Value="competition.EndDate" />
+				<ValidationMessage For="@(() => competition.EndDate)" />
+			</Div>
+		</Div>
+		<br />
+		<button type="submit" class="btn btn-primary">Create</button>
+	</EditForm>
+}
+else
+{
+	<h3>Competition editor</h3>
+	<EditForm Model="competition" OnSubmit="HandleSubmit">
+		<Div Class="Row competitionWidget">
+			<Div Class="Col">
+				<Div Class="Row">
+					<Div Class="Col">
+						<h3>@competition.Name</h3>
+						<label for="Name">Name</label>
+						<InputText @bind-Value="competition.Name" />
+					</Div>
+					<Div Class="Col">
+						<label for="State">State</label>
+						<span>
+							<Badge Color="Color.Success" Pill>
+							<InputSelect @bind-Value="competition.State">
+								<option value="Open">Open</option>
+								<option value="Closed">Closed</option>
+								<option value="Suspended">Suspended</option>
+							</InputSelect>
+						</Badge>
+					</span>
+					<br>
+				</Div>
+			</Div>
+			<Div class="form-group row">
+				<Label for="startDate" class="col-md-2 col-form-label">Start Date:</Label>
+				<Div class="col-md-10">
+					<InputDate id="startDate" class="form-control" @bind-Value="competition.StartDate" />
+					<ValidationMessage For="@(() => competition.StartDate)" />
+				</Div>
+			</Div>
+			<Div class="form-group row">
+				<Label for="endDate" class="col-md-2 col-form-label">End Date:</Label>
+				<Div class="col-md-10">
+					<InputDate id="endDate" class="form-control" @bind-Value="competition.EndDate" />
+					<ValidationMessage For="@(() => competition.EndDate)" />
+				</Div>
+			</Div>
+			<Div Class="Row competitionWidgetOptions">
+				<Div>
+					@foreach (var cat in CategoryService.Categories)
+						{
+							if (cat.CompetitionId == Id)
+							{
+								<h5>@cat.Name</h5>
+								<button class="btn btn-primary" @onclick="(() => ShowCategory(cat.Id))"><i class="oi oi-pencil"></i> Edit</button>
+							}
+						}
+					</Div>
+					<button type="submit" class="btn btn-primary">Update</button>
+					<button type="button" class="btn btn-danger" @onclick="DeleteCompetition">Delete</button>
+				</Div>
+			</Div>
+		</Div>
+	</EditForm>
+}
+
+@code {
+	[Parameter]
+	public int? Id { get; set; }
+
+	Competition competition = new Competition();
+	List<Category> selectedCategories { get; set; }
+
+	string btnText = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await CompetitionService.GetCompetitions();
+		await CategoryService.GetCategories();
+
+		selectedCategories = new List<Category>();
+		if (Id != null)
+		{
+			competition = await CompetitionService.GetSingleCompetition((int)Id);
+		}
+
+	}
+	async Task HandleSubmit()
+	{
+		if (Id == null)
+		{
+
+			competition.Categories = selectedCategories;
+			await CompetitionService.CreateCompetition(competition);
+		}
+		else
+		{
+			competition.Categories = new List<Category>();
+			await CompetitionService.UpdateCompetition(competition);
+		}
+		NavigationManager.NavigateTo("/admin/admin");
+	}
+	async Task DeleteCompetition()
+	{
+		await CompetitionService.DeleteCompetition(competition.Id);
+		NavigationManager.NavigateTo("/admin/admin");
+	}
+	public void OptionClickEvent(Category values, MouseEventArgs evnt)
+	{
+		if (evnt.CtrlKey)
+		{
+			selectedCategories.Add(values);
+		}
+	}
+
+	void ShowCategory(int id)
+	{
+		NavigationManager.NavigateTo($"/admin/category/{id}");
+	}
+}

@@ -1,0 +1,107 @@
+﻿@page "/main/movies/{id:int}"
+@using ESProjeto.Client.Services.MovieServices
+@inject IMovieService MovieService
+@using ESProjeto.Client.Services.CrewMemberServices
+@inject ICrewMemberService CrewMemberService
+@using ESProjeto.Client.Models
+@using Blazorise
+
+<style>
+    h3 {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    .popularity {
+        display: inline-block;
+        padding: 5px 10px;
+        background-color: #FFA500;
+        color: #FFF;
+        font-weight: bold;
+        border-radius: 5px;
+        background-color: #333;
+    }
+
+    .see-more-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="row">
+    <h3>@movie.Title</h3>
+
+    <div class="col">
+        <div style="display: flex; justify-content: center;">
+            <img src="@($"https://image.tmdb.org/t/p/original{@movie.Poster_Path}")" alt="poster" style="max-width:55%; max-height:55%;" />
+        </div>
+        <p>@movie.Overview</p>
+        <p>Duration: @movie.Runtime Min</p>
+        <p>Score: <span class="popularity">@movie.Popularity</span></p>
+    </div>
+    <div class="col">
+    </div>
+</div>
+<div class="row">
+</div>
+
+<h2>
+    Cast <a href="/main/movies/moviecrew/@Id" class="see-more-link">
+        <button class="float-right btn btn-dark">See More</button>
+    </a>
+</h2>
+
+
+@if (crewMembers == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        @{
+            List<ESProjeto.Client.Services.CrewMemberServices.CrewMember> uniqueCrewMembers = crewMembers.GroupBy(x => x.Name).Select(x => x.First()).Take(4).ToList();
+        }
+
+        @foreach (var crewMember in uniqueCrewMembers)
+        {
+            <div class="col-3">
+                <div class="text-center">
+                    @{
+                        string imageUrl = !string.IsNullOrEmpty(crewMember.Profile_Path) ? $"https://image.tmdb.org/t/p/w185{crewMember.Profile_Path}" : "https://static.vecteezy.com/system/resources/thumbnails/002/534/006/small/social-media-chatting-online-blank-profile-picture-head-and-body-icon-people-standing-icon-grey-background-free-vector.jpg";
+                    }
+                    <img src="@imageUrl" alt="profile" style="max-width:100%; max-height:100%; border-radius: 50%;" />
+                    <p>@crewMember.Name</p>
+                </div>
+            </div>
+
+        }
+    </div>
+}
+
+@code {
+    private List<ESProjeto.Client.Services.CrewMemberServices.CrewMember> crewMembers;
+    private ESProjeto.Client.Services.MovieServices.Movie movie { get; set; }
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        movie = await MovieService.GetMovieAsync(Id);
+        crewMembers = await CrewMemberService.GetCrewMembersByMovieIdAsync(Id);
+    }
+}

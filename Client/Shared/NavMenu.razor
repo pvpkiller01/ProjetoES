@@ -1,0 +1,82 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        
+        <a class="navbar-brand" href="">
+            <img src="https://i.imgur.com/zmI3R70.png" width="25%" height="auto" class="align-middle" style="margin-top: -10px;">
+
+            Movieroll
+        </a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="main/competitions/currentcompetitions">
+                <span class="oi oi-list-rich" aria-hidden="true"></span>Current Competitions
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="main/competitions/pastcompetitions">
+                <span class="oi oi-list-rich" aria-hidden="true"></span>Past Competitions
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="admin/admin">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Admin
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <Button class="nav-link" @onclick="ToggleFooter" style="border-style:none; border-radius: 5px;">
+                <span class="@(showFooter ? "oi oi-minus" : "oi oi-plus")" aria-hidden="true"></span>
+                @((showFooter ? "See Less" : "See More"))
+            </Button>
+        </div>
+        <div class="footer-container @(showFooter ? "open" : "closed")" style="border-style:none; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+            <div class="footer-content" style="display: flex;">
+                <span class="footerSpan">&copy;2022/2023 - Grupo de Engenharia de Software</span>
+                <div class="footerLinks">
+                    <NavLink class="nav-link" href="">
+                        <span class="oi oi-home" aria-hidden="true"></span> Home
+                    </NavLink>
+                    <NavLink class="nav-link" href="main/competitions/currentcompetitions">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Current Competitions
+                    </NavLink>
+                    <NavLink class="nav-link" href="main/competitions/pastcompetitions">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Past Competitions
+                    </NavLink>
+                    <NavLink class="nav-link" href="admin/admin">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Admin
+                    </NavLink>
+                </div>
+            </div>
+        </div>
+
+        @code {
+            private bool showFooter = false;
+            private void ToggleFooter()
+            {
+                showFooter = !showFooter;
+            }
+        }
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

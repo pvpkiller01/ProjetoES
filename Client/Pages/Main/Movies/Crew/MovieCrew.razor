@@ -1,0 +1,104 @@
+﻿@page "/main/movies/moviecrew/{id:int}"
+@inject ICrewMemberService CrewMemberService
+@using ESProjeto.Client.Models
+@using ESProjeto.Client.Services.CrewMemberServices
+@using ESProjeto.Client.Services.MovieServices
+@inject IMovieService MovieService
+
+<PageTitle>Cast of @movie.Title</PageTitle>
+
+@if (CrewMembers == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h2>Cast of @movie.Title</h2>
+    <div class="container custom-container">
+        <div class="row">
+            @foreach (var crewMember in GetUniqueCrewMembers(CrewMembers))
+            {
+                <div class="col-md-4">
+                    <Card>
+                        <CardBody>
+                            <h4 style="color:white; margin-top: 10px; margin-bottom: 10px;">@crewMember.Name</h4>
+                            <img src="@GetProfileImagePath(crewMember.Profile_Path)" alt="poster" class="img-fluid rounded-circle" />
+                            <div class="text-center mt-3">
+                                <a style="color:azure" href="crew_member/@crewMember.id">
+                                    <NavLink class="btn btn-primary btn-details">Details</NavLink>
+                                </a>
+                                <br /> <!-- Added spacing here -->
+                            </div>
+                        </CardBody>
+                    </Card>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<style>
+    .img-fluid {
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 50%;
+        width: 210px;
+        height: 316px;
+    }
+
+    .btn-details {
+        color: white;
+    }
+
+    .custom-container {
+        background-color: #333333;
+        padding: 20px;
+        border-radius: 15px;
+    }
+
+    .default-profile-image {
+        width: 210px;
+        height: 316px;
+    }
+</style>
+
+@code {
+    private List<ESProjeto.Client.Services.CrewMemberServices.CrewMember> CrewMembers { get; set; }
+    private ESProjeto.Client.Services.MovieServices.Movie movie { get; set; }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        CrewMembers = await CrewMemberService.GetCrewMembersByMovieIdAsync(Id);
+        movie = await MovieService.GetMovieAsync(Id);
+    }
+
+    private List<ESProjeto.Client.Services.CrewMemberServices.CrewMember> GetUniqueCrewMembers(List<ESProjeto.Client.Services.CrewMemberServices.CrewMember> crewMembers)
+    {
+        var uniqueCrewMembers = new List<ESProjeto.Client.Services.CrewMemberServices.CrewMember>();
+        var uniqueNames = new HashSet<string>();
+
+        foreach (var crewMember in crewMembers)
+        {
+            if (!uniqueNames.Contains(crewMember.Name))
+            {
+                uniqueCrewMembers.Add(crewMember);
+                uniqueNames.Add(crewMember.Name);
+            }
+        }
+
+        return uniqueCrewMembers;
+    }
+
+    private string GetProfileImagePath(string profilePath)
+    {
+        if (string.IsNullOrEmpty(profilePath))
+        {
+            return "https://img.freepik.com/vetores-premium/icone-de-perfil-de-avatar_188544-4755.jpg?w=2000";
+        }
+
+        return $"https://image.tmdb.org/t/p/original{profilePath}";
+    }
+}

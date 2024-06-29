@@ -1,0 +1,82 @@
+﻿@page "/admin/singlecat"
+@page "/admin/singlecat/{id:int}"
+@using Blazorise;
+@using ESProjeto.Client.Services.CompetitionServices
+@using ESProjeto.Client.Services.CategoryServices
+@using ESProjeto.Shared.Models
+@inject HttpClient httpClient
+@inject NavigationManager NavigationManager
+@inject ICompetitionService CompetitionService
+@inject ICategoryService CategoryService
+
+
+
+
+<h3>Category editor</h3>
+	<EditForm OnSubmit="HandleSubmit">
+		<Div Class="Row competitionWidget">
+			<Div Class="Col">
+				<Div Class="Row">
+					<Div Class="Col">
+						<h3>@category.Name</h3>
+						<label for="Name">Name</label>
+						<InputText @bind-Value="category.Name" />
+					</Div>
+					<Div Class="Col">
+						<label for="State">State</label>
+						<span>
+							<Badge Color="Color.Success" Pill>
+							<InputSelect @bind-Value="competition.State">
+								<option value="Open">Open</option>
+								<option value="Closed">Closed</option>
+								<option value="Suspended">Suspended</option>
+							</InputSelect>
+						</Badge>
+					</span>
+					<br>
+				</Div>
+			</Div>
+			<Div Class="Row competitionWidgetOptions">
+				<Div>
+					@foreach(var movie in CategoryService.MoviesReference)
+						{
+							<h5>@movie.MovieReference</h5>
+						}
+				</Div>
+				<button type="submit" class="btn btn-primary">Update</button>
+			</Div>
+		</Div>
+	</Div>
+</EditForm>
+
+@code {
+	[Parameter]
+	public int Id { get; set; }
+	public int counter { get; set; }
+	Category category { get; set; }
+	Competition competition = new Competition();
+
+	List<CategoryMovie> categoryMovies = new List<CategoryMovie>();
+	List<int> moviesIds = new List<int>();
+	private ESProjeto.Client.Services.MovieServices.Movie movie { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		category = await CategoryService.GetSingleCategory(Id);
+		await CompetitionService.GetCompetitions();
+		await CategoryService.GetMoviesFromCategories(Id);
+
+	}
+	async Task HandleSubmit()
+	{
+		if (Id == null)
+		{
+			await CategoryService.CreateCategory(category);
+		}
+		else
+		{
+			await CategoryService.UpdateCategory(category);
+		}
+		NavigationManager.NavigateTo("/admin/admin");
+	}
+}

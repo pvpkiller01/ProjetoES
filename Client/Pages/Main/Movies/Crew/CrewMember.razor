@@ -1,0 +1,65 @@
+﻿@page "/crew_member/{id:int}"
+@inject ICrewMemberService CrewMemberService
+@using ESProjeto.Client.Services.CrewMemberServices;
+@using Blazorise;
+
+@if (crewMember == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    string gender;
+    if (crewMember.Gender == 1)
+    {
+        gender = "Female";
+    }
+    else
+    {
+        gender = "Male";
+    }
+
+    <div class="row rounded" style="background-color:lightblue">
+        <h3>@crewMember.Name</h3>
+        <div class="col">
+            @if (string.IsNullOrEmpty(crewMember.Profile_Path))
+            {
+                <p>No photo available</p>
+            }
+            else
+            {
+                <img src="@($"https://image.tmdb.org/t/p/original{crewMember.Profile_Path}")" alt="poster" style="width: 40%; height: auto;" />
+            }
+        </div>
+        <div class="col">
+            <h5>Gender:</h5>
+            <p>@gender</p>
+            <h5>Birthday:</h5>
+            <p>@crewMember.Birthday</p>
+            <h5>Place of Birth:</h5>
+            <p>@crewMember.Place_Of_Birth</p>
+            <h5>Known for:</h5>
+            <p>@crewMember.Known_For_Department</p>
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+
+    <div class="row rounded" style="background-color:lightgrey">
+        <h4>Biography:</h4>
+        <p>@crewMember.Biography</p>
+    </div>
+}
+
+@code {
+
+    private ESProjeto.Client.Services.CrewMemberServices.CrewMember crewMember { get; set; }
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        crewMember = await CrewMemberService.GetCrewMemberByIdAsync(Id);
+    }
+}

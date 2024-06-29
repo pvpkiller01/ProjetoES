@@ -1,0 +1,61 @@
+﻿@page "/admin/admin"
+@inject HttpClient httpClient
+@using ESProjeto.Shared.Models
+@using ESProjeto.Client.Services.CompetitionServices
+@inject NavigationManager NavigationManager
+@inject ICompetitionService CompetitionService
+@using Blazorise
+
+
+<h3>Competitions</h3>
+<p></p>
+
+<Table Hoverable class="adminCompTable">
+	<TableHeader>
+		<TableRow class="adminCompTableRow">
+			<TableHeaderCell class="adminCompTableCell">Name</TableHeaderCell>
+			<TableHeaderCell class="adminCompTableCell">Start date</TableHeaderCell>
+			<TableHeaderCell class="adminCompTableCell">End date</TableHeaderCell>
+			<TableHeaderCell class="adminCompTableCell">State</TableHeaderCell>
+			<TableHeaderCell class="adminCompTableCell">Votes</TableHeaderCell>
+			<TableHeaderCell class="adminCompTableCell"></TableHeaderCell>
+		</TableRow>
+	</TableHeader>
+	<TableBody>
+		@foreach (var comp in CompetitionService.Competitions)
+		{
+			if (comp != null)
+			{
+				<TableRow>
+					<TableRowCell class="adminCompTableCell">@comp.Name</TableRowCell>
+					<TableRowCell class="adminCompTableCell">@comp.StartDate</TableRowCell>
+					<TableRowCell class="adminCompTableCell">@comp.EndDate</TableRowCell>
+					<TableRowCell class="adminCompTableCell">@comp.State</TableRowCell>
+					<TableRowCell class="adminCompTableCell">
+						<button class="btn btn-primary" @onclick="(() => ShowCompetition(comp.Id))"><i class="oi oi-pencil"></i> Edit</button>
+					</TableRowCell>
+				</TableRow>
+			}
+		}
+	</TableBody>
+</Table>
+<p></p>
+<button class="btn btn-primary " @onclick="CreateCompetition"> + Create competition</button>
+
+@code {
+	protected override async Task OnInitializedAsync()
+	{
+		await CompetitionService.GetCompetitions();
+
+	}
+
+	void ShowCompetition(int id)
+	{
+		NavigationManager.NavigateTo($"/admin/competition/{id}");
+	}
+
+	async Task CreateCompetition()
+	{
+		NavigationManager.NavigateTo("/admin/competition");
+	}
+}
